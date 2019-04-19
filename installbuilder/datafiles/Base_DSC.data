@@ -103,6 +103,7 @@ SHLIB_EXT: 'so'
 
 #if BUILD_OMS == 1
 /etc/opt/microsoft/omsagent/conf/omsagent.d; 755; ${{RUN_AS_USER}}; root; sysdir
+/opt; 755; ${{RUN_AS_USER}}; root
 /opt/dsc; 755; ${{RUN_AS_USER}}; root
 /opt/dsc/bin; 755; ${{RUN_AS_USER}}; root
 /opt/dsc/lib; 755; ${{RUN_AS_USER}}; root
@@ -116,9 +117,9 @@ SHLIB_EXT: 'so'
 #if BUILD_OMS == 1
 
 #if PACKAGE_TYPE == RPM
-omsagent >= 1.8.1
+omsagent >= 1.9.0
 #else
-omsagent (>= 1.8.1)
+omsagent (>= 1.9.0)
 #endif
 
 #else

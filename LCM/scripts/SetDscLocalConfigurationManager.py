@@ -5,12 +5,6 @@ from subprocess     import PIPE, Popen
 from sys            import argv, exc_info, exit, version_info
 from traceback      import format_exc
 from fcntl          import flock, LOCK_EX, LOCK_UN
-
-import json
-import time
-import datetime
-import os
-import os.path
 from OmsConfigHostHelpers import write_omsconfig_host_telemetry, write_omsconfig_host_event
 
 pathToCurrentScript = realpath(__file__)
@@ -62,7 +56,7 @@ def apply_meta_config(args):
             outtokens.append(str(ord(char)))
 
         omicli_path = join(helperlib.CONFIG_BINDIR, 'omicli')
-        dsc_host_base_path = '/opt/dsc'
+        dsc_host_base_path = helperlib.DSC_HOST_BASE_PATH
         dsc_host_path = join(dsc_host_base_path, 'bin/dsc_host')
         dsc_host_output_path = join(dsc_host_base_path, 'output')
         dsc_host_lock_path = join(dsc_host_base_path, 'dsc_host_lock')
@@ -104,9 +98,38 @@ def apply_meta_config(args):
         startDateTime = operationStatusUtility.get_current_time_no_ms()
 
         # Apply the metaconfig
-        process = Popen(parameters, stdout = PIPE, stderr = PIPE, close_fds = True)
-        exit_code = process.wait()
-        stdout, stderr = process.communicate()
+        if use_omsconfig_host:
+            try:
+                # Open the dsc host lock file. This also creates a file if it does not exist
+                dschostlock_filehandle = open(dsc_host_lock_path, 'w')
+                print("Opened the dsc host lock file at the path '" + dsc_host_lock_path + "'")
+                
+                dschostlock_acquired = True
+
+                # Acquire dsc host file lock
+                try:
+                    flock(dschostlock_filehandle, LOCK_EX | LOCK_NB)
+                except IOError:
+                    dschostlock_acquired = False
+
+                if dschostlock_acquired:
+                    p = subprocess.Popen(parameters, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                    stdout, stderr = p.communicate()
+                    print(stdout)
+                else:
+                    print("dsc host lock already acuired by a different process")
+                    stdout = ''
+                    stderr = ''
+            finally:
+                # Release dsc host file lock
+                flock(dschostlock_filehandle, LOCK_UN)
+
+                # Close dsc host lock file handle
+                dschostlock_filehandle.close()
+        else:
+            p = subprocess.Popen(parameters, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            exit_code = process.wait()
+            stdout, stderr = p.communicate()        
 
         print(stdout)
 

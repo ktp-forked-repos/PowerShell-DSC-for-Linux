@@ -2,16 +2,9 @@
 import fileinput
 import sys
 import subprocess
-
 from imp                import load_source
 from os.path            import dirname, isfile, join, realpath
 from fcntl              import flock, LOCK_EX, LOCK_UN, LOCK_NB
-
-import json
-import time
-import datetime
-import os
-import os.path
 from OmsConfigHostHelpers import write_omsconfig_host_telemetry, write_omsconfig_host_event
 
 pathToCurrentScript = realpath(__file__)
@@ -22,7 +15,7 @@ helperlib = load_source('helperlib', helperLibPath)
 
 omi_bindir = "<CONFIG_BINDIR>"
 omicli_path = omi_bindir + "/omicli"
-dsc_host_base_path = '/opt/dsc'
+dsc_host_base_path = helperlib.DSC_HOST_BASE_PATH
 dsc_host_path = join(dsc_host_base_path, 'bin/dsc_host')
 dsc_host_output_path = join(dsc_host_base_path, 'output')
 dsc_host_lock_path = join(dsc_host_base_path, 'dsc_host_lock')

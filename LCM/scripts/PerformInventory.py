@@ -8,12 +8,6 @@ from subprocess         import Popen, PIPE
 from sys                import argv, exc_info, exit, stdout, version_info
 from traceback          import format_exc
 from xml.dom.minidom    import parse
-
-import json
-import time
-import datetime
-import os
-import os.path
 from OmsConfigHostHelpers import write_omsconfig_host_telemetry, write_omsconfig_host_event, write_omsconfig_host_log
 
 pathToCurrentScript = realpath(__file__)
@@ -118,7 +112,7 @@ def perform_inventory(args):
     dsc_sysconfdir = join(helperlib.CONFIG_SYSCONFDIR, helperlib.CONFIG_SYSCONFDIR_DSC)
     dsc_reportdir = join(dsc_sysconfdir, 'InventoryReports')
     omicli_path = join(helperlib.CONFIG_BINDIR, 'omicli')
-    dsc_host_base_path = '/opt/dsc'
+    dsc_host_base_path = helperlib.DSC_HOST_BASE_PATH
     dsc_host_path = join(dsc_host_base_path, 'bin/dsc_host')
     dsc_host_output_path = join(dsc_host_base_path, 'output')
     dsc_host_lock_path = join(dsc_host_base_path, 'dsc_host_lock')

@@ -4,7 +4,6 @@ import sys
 import imp
 import subprocess
 from os.path import basename, dirname, join, realpath, split
-
 from imp                import load_source
 from os.path            import dirname, isfile, join, realpath
 
