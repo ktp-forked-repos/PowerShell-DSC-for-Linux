@@ -4,7 +4,7 @@ from os.path        import dirname, isfile, join, realpath
 from subprocess     import PIPE, Popen
 from sys            import argv, exc_info, exit, version_info
 from traceback      import format_exc
-from fcntl          import flock, LOCK_EX, LOCK_UN
+from fcntl          import flock, LOCK_EX, LOCK_UN, LOCK_NB
 from OmsConfigHostHelpers import write_omsconfig_host_telemetry, write_omsconfig_host_event
 
 pathToCurrentScript = realpath(__file__)
