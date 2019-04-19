@@ -127,7 +127,7 @@ def apply_meta_config(args):
                 # Close dsc host lock file handle
                 dschostlock_filehandle.close()
         else:
-            p = subprocess.Popen(parameters, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            p = Popen(parameters, stdout=PIPE, stderr=PIPE)
             exit_code = process.wait()
             stdout, stderr = p.communicate()        
 
