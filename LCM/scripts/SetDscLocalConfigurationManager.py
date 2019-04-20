@@ -1,10 +1,10 @@
 #!/usr/bin/python
-from imp            import load_source
-from os.path        import dirname, isfile, join, realpath
-from subprocess     import PIPE, Popen
-from sys            import argv, exc_info, exit, version_info
-from traceback      import format_exc
-from fcntl          import flock, LOCK_EX, LOCK_UN, LOCK_NB
+from imp                  import load_source
+from os.path              import dirname, isfile, join, realpath
+from subprocess           import PIPE, Popen
+from sys                  import argv, exc_info, exit, version_info
+from traceback            import format_exc
+from fcntl                import flock, LOCK_EX, LOCK_UN, LOCK_NB
 from OmsConfigHostHelpers import write_omsconfig_host_telemetry, write_omsconfig_host_event
 
 pathToCurrentScript = realpath(__file__)
@@ -94,6 +94,8 @@ def apply_meta_config(args):
             parameters.append("]")
             parameters.append("}")
 
+        exit_code = 0
+
         # Save the starting timestamp without milliseconds
         startDateTime = operationStatusUtility.get_current_time_no_ms()
 
@@ -113,7 +115,8 @@ def apply_meta_config(args):
                     dschostlock_acquired = False
 
                 if dschostlock_acquired:
-                    p = subprocess.Popen(parameters, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                    p = Popen(parameters, stdout=PIPE, stderr=PIPE)
+                    exit_code = p.wait()
                     stdout, stderr = p.communicate()
                     print(stdout)
                 else:
@@ -128,8 +131,8 @@ def apply_meta_config(args):
                 dschostlock_filehandle.close()
         else:
             p = Popen(parameters, stdout=PIPE, stderr=PIPE)
-            exit_code = process.wait()
-            stdout, stderr = p.communicate()        
+            exit_code = p.wait()
+            stdout, stderr = p.communicate()
 
         print(stdout)
 
