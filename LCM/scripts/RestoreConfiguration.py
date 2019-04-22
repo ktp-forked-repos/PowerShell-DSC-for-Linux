@@ -49,13 +49,17 @@ if use_omsconfig_host:
         dschostlock_filehandle = open(dsc_host_lock_path, 'w')
         print("Opened the dsc host lock file at the path '" + dsc_host_lock_path + "'")
         
-        dschostlock_acquired = True
+        dschostlock_acquired = False
 
         # Acquire dsc host file lock
-        try:
-            flock(dschostlock_filehandle, LOCK_EX | LOCK_NB)
-        except IOError:
-            dschostlock_acquired = False
+        for retry in range(10):
+            try:
+                flock(dschostlock_filehandle, LOCK_EX | LOCK_NB)
+                dschostlock_acquired = True
+                break
+            except IOError:
+                write_omsconfig_host_log(pathToCurrentScript, 'dsc_host lock file not acquired. retry (#' + str(retry) + ') after 60 seconds...')
+                time.sleep(60)
 
         if dschostlock_acquired:
             p = subprocess.Popen(parameters, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
