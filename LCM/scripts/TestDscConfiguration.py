@@ -3,8 +3,9 @@ import fileinput
 import sys
 import subprocess
 from OmsConfigHostHelpers import write_omsconfig_host_telemetry, write_omsconfig_host_event, write_omsconfig_host_log
-from imp                import load_source
-from os.path            import dirname, isfile, join, realpath
+from imp                  import load_source
+from os.path              import dirname, isfile, join, realpath
+from time                 import sleep
 
 pathToCurrentScript = realpath(__file__)
 pathToCommonScriptsFolder = dirname(pathToCurrentScript)

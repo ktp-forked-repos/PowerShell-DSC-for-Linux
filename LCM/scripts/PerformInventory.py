@@ -1,14 +1,15 @@
 #!/usr/bin/python
-from fcntl              import flock, LOCK_EX, LOCK_UN, LOCK_NB
-from imp                import load_source
-from os                 import listdir, system
-from os.path            import dirname, isfile, join, realpath
-from shutil             import move
-from subprocess         import Popen, PIPE
-from sys                import argv, exc_info, exit, stdout, version_info
-from traceback          import format_exc
-from xml.dom.minidom    import parse
+from fcntl                import flock, LOCK_EX, LOCK_UN, LOCK_NB
+from imp                  import load_source
+from os                   import listdir, system
+from os.path              import dirname, isfile, join, realpath
+from shutil               import move
+from subprocess           import Popen, PIPE
+from sys                  import argv, exc_info, exit, stdout, version_info
+from traceback            import format_exc
+from xml.dom.minidom      import parse
 from OmsConfigHostHelpers import write_omsconfig_host_telemetry, write_omsconfig_host_event, write_omsconfig_host_log
+from time                 import sleep
 
 pathToCurrentScript = realpath(__file__)
 pathToCommonScriptsFolder = dirname(pathToCurrentScript)
