@@ -79,14 +79,14 @@ def run_perform_required_configuration_checks():
             dschostlock_acquired = False
 
             # Acquire dsc host file lock
-            for retry in range(10):
+            for retry in range(60):
                 try:
                     flock(dschostlock_filehandle, LOCK_EX | LOCK_NB)
                     dschostlock_acquired = True
                     break
                 except IOError:
                     write_omsconfig_host_log(pathToCurrentScript, 'dsc_host lock file not acquired. retry (#' + str(retry) + ') after 60 seconds...')
-                    sleep(60)
+                    sleep(15)
                 
             if dschostlock_acquired:
                 p = Popen(parameters, stdout=PIPE, stderr=PIPE)
