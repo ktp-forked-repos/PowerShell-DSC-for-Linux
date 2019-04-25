@@ -6,7 +6,7 @@ import os
 import math
 import signal
 
-def write_omsconfig_host_telemetry(message):
+def write_omsconfig_host_telemetry(message, pathToCurrentScript='', level = 'INFO'):
     omsagent_telemetry_path = '/var/opt/microsoft/omsconfig/status'
     dsc_host_telemetry_path = os.path.join(omsagent_telemetry_path, 'omsconfighost')
 
@@ -29,22 +29,23 @@ def write_omsconfig_host_telemetry(message):
         host_telemetry_json['message'] = ''
         host_telemetry_json['success'] = 1
 
-    host_telemetry_json['message'] += message
+    msg_template = '<OMSCONFIGLOG>[%s] [%d] [%s] [%d] [%s:%d] %s</OMSCONFIGLOG>'
+    timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y/%m/%d %H:%M:%S')
+    msg_buffer = msg_template % (timestamp, os.getpid(), level, 0, pathToCurrentScript, 0, message)
+
+    host_telemetry_json['message'] += msg_buffer
 
     with open(dsc_host_telemetry_path, 'w+') as host_telemetry_file:
         json.dump(host_telemetry_json, host_telemetry_file)
 
-def write_omsconfig_host_event(pathToCurrentScript, dsc_host_switch_exists):
-    msg_template = '<OMSCONFIGLOG>[%s] [%d] [%s] [%d] [%s:%d] %s</OMSCONFIGLOG>'
-    timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y/%m/%d %H:%M:%S')
+def write_omsconfig_host_switch_event(pathToCurrentScript, dsc_host_switch_exists):
     if dsc_host_switch_exists:
-        msg_buffer = 'Using dsc_host'
+        message = 'Using dsc_host'
     else:
-        msg_buffer = 'Falling back to OMI'
-    message = msg_template % (timestamp, os.getpid(), 'INFO', 0, pathToCurrentScript, 0, msg_buffer)
-    write_omsconfig_host_telemetry(message)
+        message = 'Falling back to OMI'
+    write_omsconfig_host_telemetry(message, pathToCurrentScript)
 
-def write_omsconfig_host_log(pathToCurrentScript, message, level = 'INFO'):
+def write_omsconfig_host_log(message, pathToCurrentScript, level = 'INFO'):
     log_entry_template = '[%s] [%d] [%s] [%d] [%s:%d] %s'
     timestamp = datetime.datetime.fromtimestamp(time.time()).strftime('%Y/%m/%d %H:%M:%S')
     log_entry = log_entry_template % (timestamp, os.getpid(), level, 0, pathToCurrentScript, 0, message)
@@ -62,6 +63,9 @@ def write_omsconfig_host_log(pathToCurrentScript, message, level = 'INFO'):
     omsconfig_detailed_log_path = os.path.join(omsconfig_log_folder, 'omsconfigdetailed.log')
     with open(omsconfig_detailed_log_path, 'a+') as omsconfig_detailed_log_file:
         omsconfig_detailed_log_file.write(log_entry)
+    
+    if (level == 'ERROR') or (level == 'WARNING') or (level == 'FATAL'):
+        write_omsconfig_host_telemetry(message, pathToCurrentScript, level)
 
 def stop_old_host_instances():
     dsc_host_pid_path = '/opt/dsc/bin/dsc_host.pid'
@@ -90,5 +94,6 @@ def stop_old_host_instances():
     if (timestamp_diff > 3600 * 3):
         try:
             os.kill(last_host_pid, signal.SIGTERM)
+            write_omsconfig_host_log('Killing dsc_host with pid = ' + str(last_host_pid) + ' since it is older than 3 hours.', 'stop_old_host_instances', 'WARNING')
         except:
             pass

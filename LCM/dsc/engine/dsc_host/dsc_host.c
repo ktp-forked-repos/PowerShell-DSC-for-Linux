@@ -86,10 +86,11 @@ void SaveCurrentPID()
 {
     int current_pid = getpid();
 
-    FILE * fd = fopen("/opt/dsc/bin/dsc_host.pid", "w+");
+    FILE * fd = fopen(DSCHOST_PID_FILE_PATH, "w+");
     if (fd == NULL)
     {
-        Tprintf(MI_T("Failed to open file '%T' with errno = %d (%T)\n"), p_file_path, errno, strerror(errno));
+        Tprintf(MI_T("Failed to open file '%T' with errno = %d (%T)\n"), DSCHOST_PID_FILE_PATH, errno, strerror(errno));
+        DSC_TELEMETRY_ERROR("Failed to open file '%s' with errno = %d (%s)\n", DSCHOST_PID_FILE_PATH, errno, strerror(errno));
     }
     else
     {

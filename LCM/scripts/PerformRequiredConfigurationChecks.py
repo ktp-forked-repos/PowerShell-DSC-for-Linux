@@ -5,7 +5,7 @@ from subprocess import PIPE, Popen
 from sys        import exc_info, exit, version_info
 from traceback  import format_exc
 from fcntl      import flock, LOCK_EX, LOCK_UN, LOCK_NB
-from OmsConfigHostHelpers import write_omsconfig_host_telemetry, write_omsconfig_host_event, write_omsconfig_host_log
+from OmsConfigHostHelpers import write_omsconfig_host_telemetry, write_omsconfig_host_switch_event, write_omsconfig_host_log
 from time       import sleep
 
 pathToCurrentScript = realpath(__file__)
@@ -41,7 +41,7 @@ def run_perform_required_configuration_checks():
     dsc_host_switch_path = join(dsc_host_base_path, 'dsc_host_ready')
 
     if ("omsconfig" in helperlib.DSC_SCRIPT_PATH):
-        write_omsconfig_host_event(pathToCurrentScript, isfile(dsc_host_switch_path))
+        write_omsconfig_host_switch_event(pathToCurrentScript, isfile(dsc_host_switch_path))
 
     if ("omsconfig" in helperlib.DSC_SCRIPT_PATH) and (isfile(dsc_host_switch_path)):
         use_omsconfig_host = True
@@ -85,7 +85,7 @@ def run_perform_required_configuration_checks():
                     dschostlock_acquired = True
                     break
                 except IOError:
-                    write_omsconfig_host_log(pathToCurrentScript, 'dsc_host lock file not acquired. retry (#' + str(retry) + ') after 60 seconds...')
+                    write_omsconfig_host_log('dsc_host lock file not acquired. retry (#' + str(retry) + ') after 60 seconds...', pathToCurrentScript)
                     sleep(15)
                 
             if dschostlock_acquired:
